@@ -28,7 +28,7 @@ teams = [
 ]
 
 
-# MEMBER 1: GET ALL TEAMS
+
 @app.route("/api/teams", methods=["GET"])
 def get_all_teams():
     return jsonify({
@@ -36,6 +36,22 @@ def get_all_teams():
         "teams": teams
     }), 200
 
+@app.route("/api/teams/<int:team_id>", methods=["GET"])
+def get_team_by_id(team_id):
+    for team in teams:
+        if team["team_id"] == team_id:
+            return jsonify({
+                "success": True,
+                "team_id": team["team_id"],
+                "team_name": team["team_name"],
+                "wins": team["wins"],
+                "losses": team["losses"],
+                "points": team["points"]
+            }), 200
 
+    return jsonify({
+        "success": False,
+        "message": "Team not found"
+    }), 404
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
