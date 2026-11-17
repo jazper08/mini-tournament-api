@@ -103,5 +103,71 @@ def create_team():
         **new_team
     }), 201
 
+
+# MEMBER 4 - PUT UPDATE TEAM
+@app.route("/api/teams/<int:team_id>", methods=["PUT"])
+def update_team(team_id):
+    for team in teams:
+        if team["team_id"] == team_id:
+            data = request.get_json(silent=True)
+
+            if not isinstance(data, dict):
+                return jsonify({
+                    "success": False,
+                    "message": "Invalid JSON data"
+                }), 400
+
+            name = data.get("team_name")
+            wins = data.get("wins")
+            losses = data.get("losses")
+
+            if (
+                not isinstance(name, str)
+                or not name.strip()
+                or type(wins) is not int
+                or type(losses) is not int
+                or wins < 0
+                or losses < 0
+            ):
+                return jsonify({
+                    "success": False,
+                    "message": "Invalid team information"
+                }), 400
+
+            team["team_name"] = name.strip()
+            team["wins"] = wins
+            team["losses"] = losses
+            team["points"] = wins * 3
+
+            return jsonify({
+                "success": True,
+                "message": "Team updated successfully",
+                **team
+            }), 200
+
+    return jsonify({
+        "success": False,
+        "message": "Team not found"
+    }), 404
+
+# MEMBER 4 - DELETE TEAM
+@app.route("/api/teams/<int:team_id>", methods=["DELETE"])
+def delete_team(team_id):
+    for team in teams:
+        if team["team_id"] == team_id:
+            teams.remove(team)
+
+            return jsonify({
+                "success": True,
+                "message": "Team deleted successfully",
+                "deleted_team_id": team_id
+            }), 200
+
+    return jsonify({
+        "success": False,
+        "message": "Team not found"
+    }), 404
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
